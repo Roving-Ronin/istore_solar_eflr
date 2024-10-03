@@ -1,0 +1,199 @@
+type: custom:apexcharts-card
+apex_config:
+  plotOptions:
+    bar:
+      columnWidth: 90%
+      dataLabels:
+        position: bottom
+  chart:
+    height: 275px
+    defaultLocale: da
+    locales:
+      - name: da
+        options:
+          shortDays:
+            - SØN
+            - MAN
+            - TIR
+            - ONS
+            - TOR
+            - FRE
+            - LØR
+  dataLabels:
+    enabled: true
+    style:
+      fontSize: 12px
+      colors:
+        - '#fff'
+    distributed: true
+    background:
+      enabled: false
+    formatter: |
+      EVAL:function(value) {
+        return value.toFixed(1);
+      }
+  xaxis:
+    labels:
+      position: 'on'
+      hideOverlappingLabels: false
+      showDuplicates: true
+      show: true
+      format: ddd
+      style:
+        fontSize: 12px
+        fontWeight: 400
+    axisBorder:
+      show: true
+      color: grey
+    tooltip:
+      enabled: false
+all_series_config:
+  unit: ' kWh'
+experimental:
+  color_threshold: true
+  hidden_by_default: true
+header:
+  title: Ugens forventede solproduktion
+  show: true
+  standard_format: true
+  show_states: true
+  colorize_states: true
+graph_span: 1week
+span:
+  start: day
+  offset: '-0h'
+series:
+  - entity: sensor.solcast_pv_forecast_forecast_tomorrow
+    name: Prognose
+    type: column
+    show:
+      in_header: false
+      in_chart: true
+      legend_value: false
+      datalabels: true
+    float_precision: 2
+    data_generator: >
+      // REMOVE ME
+
+
+      const date = new Date();
+
+      let day = date.getDate();
+
+      let month = date.getMonth();
+
+      let year = date.getFullYear();
+
+      let curDate = new Date(year,month,day)
+
+      const list = [];
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_today'].state);
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_tomorrow'].state);
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_day_3'].state);
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_day_4'].state);
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_day_5'].state);
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_day_6'].state);
+
+      list.push(hass.states['sensor.solcast_pv_forecast_forecast_day_7'].state);
+
+      const data = [];
+
+      for(let i = 0; i <= list.length-1; i++) {
+        let d1=new Date(curDate.getTime()+(60*60*24*1000*i));
+        data.push([d1, list[i]]);
+      }
+
+      return data;
+    group_by:
+      func: first
+      duration: 1day
+    extend_to: false
+    color_threshold:
+      - value: 30
+        color: darkgreen
+      - value: 25
+        color: green
+      - value: 20
+        color: '#c3cc1f'
+      - value: 15
+        color: '#ded012'
+      - value: 10
+        color: orange
+      - value: 5
+        color: red
+      - value: 0
+        color: darkred
+  - entity: sensor.solcast_pv_forecast_forecast_tomorrow
+    name: Total
+    type: column
+    show:
+      in_header: true
+      in_chart: false
+    float_precision: 2
+    transform: >
+      // REMOVE ME
+
+      var total = 0;
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_today'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_tomorrow'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_3'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_4'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_5'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_6'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_7'].state);
+
+      return total;
+  - entity: sensor.solcast_pv_forecast_forecast_tomorrow
+    name: Gns. pr. dag
+    type: column
+    show:
+      in_header: true
+      in_chart: false
+    float_precision: 2
+    transform: >
+      // REMOVE ME
+
+      var total = 0;
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_today'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_tomorrow'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_3'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_4'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_5'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_6'].state);
+
+      total +=
+      Number(hass.states['sensor.solcast_pv_forecast_forecast_day_7'].state);
+
+      return total/7;
